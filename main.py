@@ -13,7 +13,7 @@ def home():
 
 @app.route('/donations/')
 def all():
-    if request.args.get('donor') != '':
+    if request.args.get('donor') != '' and request.args.get('donor') != None:
         donations = Donation.select().where(Donation.donor == request.args.get('donor'))
     else:
         donations = Donation.select()
