@@ -13,8 +13,17 @@ def home():
 
 @app.route('/donations/')
 def all():
-    donations = Donation.select()
-    return render_template('donations.jinja2', donations=donations)
+    if request.args.get('donor') != '':
+        donations = Donation.select().where(Donation.donor == request.args.get('donor'))
+    else:
+        donations = Donation.select()
+    donors = Donor.select()
+    return render_template(
+        'donations.jinja2',
+        donations=donations,
+        donors=donors,
+        request=request
+    )
 
 @app.route('/add/', methods=['GET', 'POST']    )
 def add():

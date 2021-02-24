@@ -8,4 +8,14 @@
         <li><b>{{ donation.donor.name }}</b>: {{ donation.value }}</li>
     {% endfor %}
 </ul>
+<form method="get">
+    Filter by donor:
+    <select name="donor">
+        <option value="" />* All *
+{% for donor in donors %}
+        <option value="{{ donor.name }}"{{ " selected" if donor.name == request.args.get('donor') }} />{{ donor.name }}
+{% endfor %}
+    </select>
+<input type="submit" value="Filter" />
+</form>
 {% endblock content %}
