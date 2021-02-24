@@ -6,5 +6,8 @@
 	<h1>Donations</h1>
 	<h2>{% block subtitle %} {% endblock subtitle %}</h2>
 	{% block content %} {% endblock content %}
+	{% if request.path != '/donations/' %}<a href="/donations/">View Donations</a>{% else %}View Donations{% endif %}
+	|
+	{% if request.path != '/add/' %}<a href="/add/">Add a Donation</a>{% else %}Add a Donation{% endif %}
 </body>
 </html>
