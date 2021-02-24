@@ -13,7 +13,7 @@ def home():
 
 @app.route('/donations/')
 def all():
-    if request.args.get('donor') != '' and request.args.get('donor') != None:
+    if request.args.get('donor') != '' and request.args.get('donor') is not None:
         donations = Donation.select().where(Donation.donor == request.args.get('donor'))
     else:
         donations = Donation.select()
@@ -25,7 +25,7 @@ def all():
         request=request
     )
 
-@app.route('/add/', methods=['GET', 'POST']    )
+@app.route('/add/', methods=['GET', 'POST'])
 def add():
     error = ''
     if request.method == 'POST':
@@ -47,11 +47,10 @@ def add():
         error = 'A donor name and a positive, non-zero donation amount are required.'
     return render_template(
         'new_donation.jinja2',
-        error = error,
-        request = request
+        error=error,
+        request=request
     )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 6738))
     app.run(host='0.0.0.0', port=port)
-
