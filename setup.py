@@ -1,8 +1,11 @@
+import os
 import random
+
+from passlib.hash import pbkdf2_sha256
 
 from model import db, Donor, Donation, User
 
-db.connect()
+db.connect(os.environ.get('DATABASE_URL', 'sqlite:///my_database.db'))
 
 # This line will allow you "upgrade" an existing database by
 # dropping all existing tables from it.
@@ -10,20 +13,21 @@ db.drop_tables([Donor, Donation, User])
 
 db.create_tables([Donor, Donation, User])
 
-# I just can't bring myself to create a user here and commit a password to source. :)
-# I'll provide an account to the running app in the submission
+if os.environ.get('IN_HEROKU') != "true":
+    # Don't create test data in Heroku
 
-alice = Donor(name="Alice")
-alice.save()
+    User(username="Test", password=pbkdf2_sha256.hash('test')).save()
 
-bob = Donor(name="Bob")
-bob.save()
+    alice = Donor(name="Alice")
+    alice.save()
 
-charlie = Donor(name="Charlie")
-charlie.save()
+    bob = Donor(name="Bob")
+    bob.save()
 
-donors = [alice, bob, charlie]
+    charlie = Donor(name="Charlie")
+    charlie.save()
 
-for x in range(30):
-    Donation(donor=random.choice(donors), value=random.randint(100, 10000)).save()
+    donors = [alice, bob, charlie]
 
+    for x in range(30):
+        Donation(donor=random.choice(donors), value=random.randint(100, 10000)).save()
