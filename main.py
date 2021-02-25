@@ -6,9 +6,23 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from model import Donation, Donor
 
 app = Flask(__name__)
+# Get the secret key from an environment variable, but set it to something random if it doesn't
+# exist so that the app doesn't break.  However, sessions will be invalidated if this app re-runs,
+# which isn't necessarily what we want.
+app.secret_key = os.environ.get('FLASK_SESSION_KEY', os.urandom(24).hex())
 
 @app.route('/')
 def home():
+    return redirect(url_for('all'))
+
+@app.route('/login/')
+def login():
+    session['username'] = "sean"
+    return redirect(url_for('all'))
+
+@app.route('/logout/')
+def logout():
+    session.pop('username')
     return redirect(url_for('all'))
 
 @app.route('/donations/')
@@ -27,6 +41,8 @@ def all():
 
 @app.route('/add/', methods=['GET', 'POST'])
 def add():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     error = ''
     if request.method == 'POST':
         try:
