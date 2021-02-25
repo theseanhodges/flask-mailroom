@@ -15,6 +15,9 @@ app.secret_key = os.environ.get('FLASK_SESSION_KEY', os.urandom(24).hex())
 
 @app.route('/')
 def home():
+    if not User.select():
+        # Let the user create a new user account since there are none
+        return redirect(url_for('new_user'))
     return redirect(url_for('all'))
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -42,6 +45,45 @@ def login():
 def logout():
     session.pop('username')
     return redirect(url_for('all'))
+
+@app.route('/newuser/', methods=['GET', 'POST'])
+def new_user():
+    """
+    Allow creation of a new user if:
+    1. No users exist, or
+    2. A valid user is logged in.
+    I need to cut this short at some point but the next step would be to differentiate user levels
+    and only allow superusers to do this.
+    """
+    error = ''
+    if User.select():
+        if 'username' in session.keys():
+            if not User.select().where(User.username == session['username']):
+                # We have a valid session but the user is not in the DB
+                # For now this is an unexpected edge case since there's no functionality to delete
+                # users, but...
+                return redirect(url_for('all'))
+        else:
+            return redirect(url_for('all'))
+    if request.method == 'POST':
+        if request.form['username'] == '' or request.form['password'] == '':
+            error = 'All fields are required.'
+        elif request.form['password'] != request.form['confirm']:
+            error = 'Passwords do not match.'
+        elif User.select().where(User.username == request.form['username']):
+            error = 'User already exists.'
+        else:
+            User(
+                username=request.form['username'],
+                password=pbkdf2_sha256.hash(request.form['password'])
+            ).save()
+            return redirect(url_for('all'))
+    return render_template(
+        'new_user.jinja2',
+        error=error,
+        request=request,
+        username=session['username'] if 'username' in session.keys() else ''
+    )
 
 @app.route('/donations/')
 def all():

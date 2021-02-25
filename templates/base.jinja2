@@ -15,5 +15,8 @@
 	|
 	{% if username == '' %}Add a Donation (login first!){% else %}
 	{% if request.path != '/add/' %}<a href="/add/">Add a Donation</a>{% else %}Add a Donation{% endif %}{% endif %}
+	|
+	{% if username == '' %}New User (login first!){% else %}
+	{% if request.path != '/newuser/' %}<a href="/newuser/">New User</a>{% else %}New User{% endif %}{% endif %}
 </body>
 </html>
