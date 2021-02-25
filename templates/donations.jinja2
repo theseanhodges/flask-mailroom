@@ -5,7 +5,7 @@
 {% block content %}
 <ul>
     {% for donation in donations %}
-        <li><b>{{ donation.donor.name }}</b>: {{ donation.value }}</li>
+        <li><b>{{ donation.donor.name }}</b>: {{ "${:,.2f}".format(donation.value) }}</li>
     {% endfor %}
 </ul>
 <form method="get">
