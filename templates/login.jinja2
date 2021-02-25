@@ -1,0 +1,12 @@
+{% extends 'base.jinja2' %}
+
+{% block subtitle %}Login{% endblock subtitle %}
+
+{% block content %}
+<form method="post">
+    {% if error != '' %}<span style="color:red;">{{ error }}<br /><br /></span>{% endif %}
+    Username: <input type="text" name="username" /><br />
+    Password: <input type="password" name="password" /><br />
+    <input type="submit" value="Login" />
+</form>
+{% endblock content %}

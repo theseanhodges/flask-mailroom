@@ -2,8 +2,9 @@ import os
 import base64
 
 from flask import Flask, render_template, request, redirect, url_for, session
+from passlib.hash import pbkdf2_sha256
 
-from model import Donation, Donor
+from model import Donation, Donor, User
 
 app = Flask(__name__)
 # Get the secret key from an environment variable, but set it to something random if it doesn't
@@ -15,10 +16,26 @@ app.secret_key = os.environ.get('FLASK_SESSION_KEY', os.urandom(24).hex())
 def home():
     return redirect(url_for('all'))
 
-@app.route('/login/')
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
-    session['username'] = "sean"
-    return redirect(url_for('all'))
+    if 'username' in session:
+        # Redirect home if the user is already logged in
+        return redirect(url_for('all'))
+    error = ''
+    if request.method == 'POST':
+        user = User.select().where(User.username == request.form['username'])
+        if user:
+            user_record = user.get()
+            if pbkdf2_sha256.verify(request.form['password'], user_record.password):
+                session['username'] = user_record.username
+                return redirect(url_for('all'))
+        error = 'Invalid login.'
+    return render_template(
+        'login.jinja2',
+        error=error,
+        request=request,
+        username=session['username'] if 'username' in session.keys() else ''
+    )
 
 @app.route('/logout/')
 def logout():
@@ -36,7 +53,8 @@ def all():
         'donations.jinja2',
         donations=donations,
         donors=donors,
-        request=request
+        request=request,
+        username=session['username'] if 'username' in session.keys() else ''
     )
 
 @app.route('/add/', methods=['GET', 'POST'])
@@ -64,7 +82,8 @@ def add():
     return render_template(
         'new_donation.jinja2',
         error=error,
-        request=request
+        request=request,
+        username=session['username'] if 'username' in session.keys() else ''
     )
 
 if __name__ == "__main__":

@@ -6,8 +6,12 @@
 	<h1>Donations</h1>
 	<h2>{% block subtitle %} {% endblock subtitle %}</h2>
 	{% block content %} {% endblock content %}
+	{% if username == '' %}{% if request.path != '/login/' %}<a href="/login/">Login</a>{% else %}Login{% endif %}
+	{% else %}<a href="/logout/">Logout</a>{% endif %}
+	|
 	{% if request.path != '/donations/' %}<a href="/donations/">View Donations</a>{% else %}View Donations{% endif %}
 	|
-	{% if request.path != '/add/' %}<a href="/add/">Add a Donation</a>{% else %}Add a Donation{% endif %}
+	{% if username == '' %}Add a Donation (login first!){% else %}
+	{% if request.path != '/add/' %}<a href="/add/">Add a Donation</a>{% else %}Add a Donation{% endif %}{% endif %}
 </body>
 </html>
