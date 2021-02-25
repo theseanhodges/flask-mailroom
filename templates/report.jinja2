@@ -8,7 +8,7 @@
         <li><b>{{ donation.name }}</b>
             <ul>
                 <li>Donations: {{ donation.count }}</li>
-                <li>Total: {{ "$%.2f" | format(donation.sum) }}</li>
+                <li>Total: {{ "${:,.2f}".format(donation.sum) }}</li>
             </ul>
     {% endfor %}
 </ul>
