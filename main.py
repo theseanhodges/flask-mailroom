@@ -3,6 +3,7 @@ import base64
 
 from flask import Flask, render_template, request, redirect, url_for, session
 from passlib.hash import pbkdf2_sha256
+from peewee import fn, JOIN
 
 from model import Donation, Donor, User
 
@@ -53,6 +54,25 @@ def all():
         'donations.jinja2',
         donations=donations,
         donors=donors,
+        request=request,
+        username=session['username'] if 'username' in session.keys() else ''
+    )
+
+@app.route('/report/')
+def report():
+    donations = Donor.select(
+        Donor,
+        fn.Count(Donation.value).alias('count'),
+        fn.Sum(Donation.value).alias('sum')
+    ).join(
+        Donation,
+        JOIN.LEFT_OUTER
+    ).group_by(
+        Donor
+    )
+    return render_template(
+        'report.jinja2',
+        donations=donations,
         request=request,
         username=session['username'] if 'username' in session.keys() else ''
     )
